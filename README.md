@@ -1,5 +1,5 @@
 # single-node-ocp-proxmox
-Terraform + Shellscript for deploying OpenShift on Proxmox
+Terraform + Shellscript for deploying OpenShift on Proxmox. This is intended to serve as an example more than something you'd actually use but if it helps, go for it!
 
 This is the beginnings of a Terraform module that deploy a single node OpenShift environment in Proxmox using bootstrap in place.  
 
