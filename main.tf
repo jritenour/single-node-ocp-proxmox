@@ -22,7 +22,7 @@ resource "null_resource" "bastion_iso_gen" {
 }
 
 provider "proxmox" {
-  pm_api_url = "https://192.168.2.4:8006/api2/json"
+  pm_api_url = "https://{var.proxmox_pve}:8006/api2/json"
   pm_tls_insecure = true
 }
 

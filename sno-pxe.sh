@@ -52,31 +52,17 @@ echo Generating single node ignition config
 
 openshift-install create single-node-ignition-config --dir=sno-working
 
-echo Downloading CoreOS Live ISO to 'sno-working/base.iso'
+echo Downloading latest CoreOS live kernel
 
-ISO_URL=$(openshift-install coreos print-stream-json | grep location | grep x86_64 | grep iso | cut -d\" -f4)
+sudo wget https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.9/latest/rhcos-4.9.0-x86_64-live-kernel-x86_64 -P /var/www/html 
 
-curl $ISO_URL --retry 5 -o sno-working/base.iso 
-echo Pulling and running coreos-installer container image to generate custom live ISO.
+echo Downloading latest CoreOS live root file system 
+sudo wget https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.9/latest/rhcos-4.9.0-x86_64-live-rootfs.x86_64.img -P /var/www/html
 
-export ISO_PATH=sno-working/base.iso
-export IGNITION_PATH=sno-working/bootstrap-in-place-for-live-iso.ign
-export OUTPUT_PATH=sno-working/embedded.iso
+echo Downloading latest CoreOS live init image
 
-podman run \
-    --pull=always \
-    --privileged \
-    --rm \
-    -v /dev:/dev \
-    -v /run/udev:/run/udev \
-    -v $(realpath $(dirname "$ISO_PATH")):/data:Z \
-    -v $(realpath $(dirname "$IGNITION_PATH")):/ignition_data:Z \
-    -v $(realpath $(dirname "$OUTPUT_PATH")):/output_data:Z \
-    --workdir /data \
-    quay.io/coreos/coreos-installer:release \
-    iso ignition embed /data/$(basename "$ISO_PATH") \
-    --force \
-    --ignition-file /ignition_data/$(basename "$IGNITION_PATH") \
-    --output /output_data/$(basename "$OUTPUT_PATH")
+sudo wget https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.9/latest/rhcos-4.9.0-x86_64-live-initramfs.x86_64.img -P /var/www/html
 
-scp sno-working/embedded.iso root@$PROXMOX_IP:/var/lib/vz/template/iso/sno.iso
+echo Copying ignition to www root
+
+sudo cp ./sno-working/bootstrap-in-place-for-live-iso.ign /var/www/html/sno.ign
